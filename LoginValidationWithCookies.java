@@ -50,52 +50,44 @@ public class LoginValidationWithCookies extends HttpServlet {
 		String password = null; 
 		Boolean loggedIn = false;
 		Boolean isAdmin=false;
+		Boolean cookieResponse=false;
 		Cookie[] allCookies = request.getCookies();
-		if(allCookies!=null) {
-			for(int i = 0;i<2;i++) {
+		if (allCookies != null) {
+			for (int i = 0; i < allCookies.length; i++) {
 				Cookie temp = allCookies[i];
-				if(temp.getName().equalsIgnoreCase("userName")) {
-					if(request.getParameter("userName").equalsIgnoreCase(temp.getValue())) {
-						username=temp.getValue();
-						//cookieResponse=true;
-					}else {
-						username=request.getParameter("userName");
-						password = request.getParameter("password");
-						Cookie userName = new Cookie("userName",username);
-						Cookie userPassword = new Cookie("userPassword",password);
-						response.addCookie(userName);
-						response.addCookie(userPassword);
-						System.out.println("created Cookies");
-						//cookieResponse=false;
-					}
-				}else if (temp.getName().equalsIgnoreCase("userPassword")) {
-					if(request.getParameter("password").equalsIgnoreCase(temp.getValue())) {
-						password=temp.getValue();
-						//cookieResponse=true;
-					}else {
-						username=request.getParameter("userName");
-						password = request.getParameter("password");
-						Cookie userName = new Cookie("userName",username);
-						Cookie userPassword = new Cookie("userPassword",password);
-						response.addCookie(userName);
-						response.addCookie(userPassword);
-						System.out.println("created Cookies");
-						//cookieResponse=false;
-					}
+				System.out.println("Cookie:" + temp.getName());
+				if (temp.getName().equalsIgnoreCase(request.getParameter("userName"))) {
+					
+					username = temp.getName();
+					password = temp.getValue();
+					System.out.println("username: " + username + "password: " + password);
+					cookieResponse = true;
+				} else {
+					System.out.println("Invalid match failed");
+					cookieResponse = false;
 				}
 			}
-			
-			System.out.println("using Cookies");
-		}else {
-			username=request.getParameter("userName");
+			if (!cookieResponse) {
+				username = request.getParameter("userName");
+				password = request.getParameter("password");
+				Cookie userName = new Cookie(username, password);
+
+				response.addCookie(userName);
+
+				System.out.println("created Cookies" + userName.getName());
+				cookieResponse = false;
+			}
+
+		} else {
+			username = request.getParameter("userName");
 			password = request.getParameter("password");
-			Cookie userName = new Cookie("userName",username);
-			Cookie userPassword = new Cookie("userPassword",password);
+			Cookie userName = new Cookie(username, password);
+
 			response.addCookie(userName);
-			response.addCookie(userPassword);
+
 			System.out.println("created Cookies");
+			cookieResponse = false;
 		}
-		
 		
 		try {
 			Class.forName("oracle.jdbc.OracleDriver");
